@@ -57,4 +57,48 @@
   };
 
   // ADD YOUR CODE HERE
+  $( document ).ready(function() {
+    var searchBtn = $("#searchBtn");
+    searchBtn.on("click", function(event){
+      event.preventDefault();
+      var movieTitle = $(this).closest("form").find("input[name='search']").val();
+      if(movieTitle === "") {
+        alert("Please enter a movie title!");
+        return;
+      }
+      movieTitle = movieTitle.replace(/\s+/g, '');
+      $('#search').val('');
+      getMovie(movieTitle);
+    });
+  });
+
+
+  function getMovie(movieTitle) {
+      var currentURL = "http://www.omdbapi.com/?t="+ movieTitle + "&y=&plot=full&r=json";
+      var request = $.ajax({
+          type: "GET",
+          url: currentURL,
+          dataType: "json"
+      });
+
+      request.done(function (data) {
+        console.log(data);
+        var movie = {
+          id: data['imdbID'],
+          poster: data['Poster'],
+          title: data['Title'],
+          year: data['Year'],
+          plot: data['Plot']
+        };
+        console.log(movie);
+        movies.push(movie);
+
+        console.log(movies);
+        renderMovies(movie);
+      });
+
+      request.fail(function (jqXHR, textStatus) {
+          alert('Request failed: ' + textStatus);
+      });
+    }
 })();
