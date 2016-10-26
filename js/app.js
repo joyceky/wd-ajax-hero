@@ -73,32 +73,71 @@
   });
 
 
-  function getMovie(movieTitle) {
-      var currentURL = "http://www.omdbapi.com/?t="+ movieTitle + "&y=&plot=full&r=json";
-      var request = $.ajax({
-          type: "GET",
-          url: currentURL,
-          dataType: "json"
-      });
+  // function getMovie(movieTitle) {
+  //     var currentURL = "http://www.omdbapi.com/?s="+ movieTitle;
+  //     var request = $.ajax({
+  //         type: "GET",
+  //         url: currentURL,
+  //         dataType: "json"
+  //     });
+function getMovie(movieTitle) {
+      var $xhr = $.getJSON("http://www.omdbapi.com/?s="+ movieTitle + "&y=&plot=full&r=json");
 
-      request.done(function (data) {
-        console.log(data);
-        var movie = {
-          id: data['imdbID'],
-          poster: data['Poster'],
-          title: data['Title'],
-          year: data['Year'],
-          plot: data['Plot']
-        };
-        console.log(movie);
-        movies.push(movie);
-
-        console.log(movies);
-        renderMovies(movie);
-      });
-
-      request.fail(function (jqXHR, textStatus) {
-          alert('Request failed: ' + textStatus);
-      });
+$xhr.done(function(data) {
+    if ($xhr.status !== 200) {
+        return;
     }
+
+    for (var i = 0; i < data.Search.length; i++) {
+      var movie = {
+            id: data.Search[i]['imdbID'],
+            poster: data.Search[i]['Poster'],
+            title: data.Search[i]['Title'],
+            year: data.Search[i]['Year'],
+            plot: data.Search[i]['Plot']
+          };
+      movies.push(movie);
+    }
+    // renderMovies();
+    getPlot();
+});
+
+function getPlot() {
+  //for each data search id, plug in id and get plot, then render movies
+  for (var i = 0; i < movies.length; i++) {
+    var id = movies[i]['imdbID'];
+    var $xhr = $.getJSON("http://www.omdbapi.com/?t="+ id + "&y=&plot=full&r=json");
+
+    $xhr.done(function(data) {
+        if ($xhr.status !== 200) {
+            return;
+        }
+        console.log(data);
+
+  });
+ }
+}
+  renderMovies();
+}
 })();
+
+//       request.done(function (data.Search) {
+//         console.log(data.Search);
+//         // var movie = {
+//         //   id: data['imdbID'],
+//         //   poster: data['Poster'],
+//         //   title: data['Title'],
+//         //   year: data['Year'],
+//         //   plot: data['Plot']
+//         // };
+//         // console.log(movie);
+//         // movies.push(movie);
+//         //
+//         // console.log(movies);
+//         // renderMovies(movie);
+//       });
+//
+//       request.fail(function (jqXHR, textStatus) {
+//           alert('Request failed: ' + textStatus);
+//       });
+//     }
