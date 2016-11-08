@@ -1,5 +1,6 @@
+'use strict';
+
 (function() {
-  'use strict';
 
   var movies = [];
 
@@ -56,12 +57,14 @@
     }
   };
 
+  // var movieTitle = $(this).closest("form").find("input[name='search']").val();
+
+
   // ADD YOUR CODE HERE
   $( document ).ready(function() {
-    var searchBtn = $("#searchBtn");
-    searchBtn.on("click", function(event){
+    $("#searchBtn").on("click", function(event){
       event.preventDefault();
-      var movieTitle = $(this).closest("form").find("input[name='search']").val();
+      var movieTitle = $("#search").val();
       if(movieTitle === "") {
         alert("Please enter a movie title!");
         return;
@@ -80,6 +83,7 @@
   //         url: currentURL,
   //         dataType: "json"
   //     });
+
 function getMovie(movieTitle) {
       var $xhr = $.getJSON("http://www.omdbapi.com/?s="+ movieTitle + "&y=&plot=full&r=json");
 
@@ -87,39 +91,54 @@ $xhr.done(function(data) {
     if ($xhr.status !== 200) {
         return;
     }
-
+    console.log(data);
     for (var i = 0; i < data.Search.length; i++) {
       var movie = {
             id: data.Search[i]['imdbID'],
             poster: data.Search[i]['Poster'],
             title: data.Search[i]['Title'],
-            year: data.Search[i]['Year'],
-            plot: data.Search[i]['Plot']
+            year: data.Search[i]['Year']
+          }
+
+            var $xhr2 = $.getJSON("http://www.omdbapi.com/?t=" + movie.id);
+
+            $xhr2.done(function(data) {
+                if ($xhr.status !== 200) {
+                    return;
+                }
+                console.log(data);
+                movie = {
+                  plot: data['Plot']
           };
+                console.log(movie);
+          });
+          console.log(movie);
+
       movies.push(movie);
     }
-    // renderMovies();
-    getPlot();
-});
-
-function getPlot() {
-  //for each data search id, plug in id and get plot, then render movies
-  for (var i = 0; i < movies.length; i++) {
-    var id = movies[i]['imdbID'];
-    var $xhr = $.getJSON("http://www.omdbapi.com/?t="+ id + "&y=&plot=full&r=json");
-
-    $xhr.done(function(data) {
-        if ($xhr.status !== 200) {
-            return;
-        }
-        console.log(data);
-
-  });
- }
-}
   renderMovies();
+});
 }
 })();
+
+//
+// function getPlot(movie) {
+//   //for each data search id, plug in id and get plot, then render movies
+//   var $xhr = $.getJSON("http://www.omdbapi.com/?t=" + movie.id);
+//
+//   $xhr.done(function(data) {
+//       if ($xhr.status !== 200) {
+//           return;
+//       }
+//       console.log(data);
+//       movie = {
+//         plot: data['Plot']
+// };
+//       console.log(movie);
+//   });
+//   renderMovies();
+//
+//  }
 
 //       request.done(function (data.Search) {
 //         console.log(data.Search);
